@@ -25,7 +25,7 @@ if [[ "$1" == "compile" ]]; then
     source clang_env.sh
     root_dir="$(pwd)"
     source ${root_dir}/hdf5/env.sh
-    export HDF5_ROOT=${root_dir}/install114/ci-StdShar-Clang
+    export HDF5_ROOT=${root_dir}/install/ci-StdShar-Clang
     OPENMC_TARGET=llvm_pp4ogpc
 
     # Create directories and delete old build/install
@@ -40,6 +40,9 @@ if [[ "$1" == "compile" ]]; then
     cmake_cmd="cmake                                                            \
     --preset=${OPENMC_TARGET}                                                   \
     -DCMAKE_INSTALL_PREFIX=../install                                           \
+    -DCMAKE_CXX_STANDARD=17                                                     \
+    -DCMAKE_CXX_STANDARD_REQUIRED=ON                                            \
+    -DCMAKE_CXX_EXTENSIONS=OFF                                                  \
     -Dprofile=on"
     # -DCMAKE_BUILD_TYPE=RelWithDebInfo
 

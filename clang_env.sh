@@ -16,6 +16,4 @@ add_lib_paths=$clang_dir/lib:$clang_dir/lib/x86_64-unknown-linux-gnu:$clang_dir/
 export LIBRARY_PATH=$add_lib_paths:$LIBRARY_PATH
 export LD_LIBRARY_PATH=$add_lib_paths:$LD_LIBRARY_PATH
 export LLVM_DIR=$(readlink -f "$root_dir/../llvm-build")
-
-# Features runtime
 export LIBOMPTARGET_INFO=$((0x1 | 0x10)) 

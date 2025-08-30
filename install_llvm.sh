@@ -4,7 +4,7 @@ set -e
 
 root_dir="$(pwd)"
 source $root_dir/spack_env.sh
-source $root_dir/clang_env.sh #TODO remove
+source $root_dir/clang_env.sh
 
 # Directories - customize to your development environment
 llvm_install_dir=$(readlink -f "$root_dir/../")
