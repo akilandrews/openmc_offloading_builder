@@ -27,6 +27,7 @@ if [[ "$1" == "compile" ]]; then
     source ${root_dir}/hdf5/env.sh
     export HDF5_ROOT=${root_dir}/install/ci-StdShar-Clang
     OPENMC_TARGET=llvm_pp4ogpc
+    export EXTRA_CFLAGS="--config=$root_dir/openmc/amdgcn-amd-amdhsa.cfg"
 
     # Create directories and delete old build/install
     echo "build dir:   ./build"
@@ -43,32 +44,16 @@ if [[ "$1" == "compile" ]]; then
     -DCMAKE_CXX_STANDARD=17                                                     \
     -DCMAKE_CXX_STANDARD_REQUIRED=ON                                            \
     -DCMAKE_CXX_EXTENSIONS=OFF                                                  \
-    -Dprofile=on"
+    -Dprofile=on                                                                \
+    -Doptimize=on"
     # -DCMAKE_BUILD_TYPE=RelWithDebInfo
-
-    # Check if OPENMC_CXX_FLAGS is set and not empty
-    if [ ! -z "${OPENMC_CXX_FLAGS}" ]; then
-        # Append CXX flags to the cmake command
-        echo -e "\033[31mWARNING: OPENMC_CXX_FLAGS has been set. This"          \
-            "overwrites CMakePresets.json commands for ${OPENMC_TARGET}, so you"\
-            " will need to manually include them in your redefinition.\033[0m "
-        cmake_cmd+=" -DCMAKE_CXX_FLAGS=\"${OPENMC_CXX_FLAGS}\""
-    fi
-
-    # Check if OPENMC_LD_FLAGS is set and not empty
-    if [ ! -z "${OPENMC_LD_FLAGS}" ]; then
-        # Append linker flags to the cmake command
-        echo -e "\033[31mWARNING: OPENMC_LD_FLAGS has been set. This overwrites"\
-            " CMakePresets.json commands for ${OPENMC_TARGET}, so you will need"\
-            " to manually include them in your redefinition.\033[0m "
-        cmake_cmd+=" -DCMAKE_EXE_LINKER_FLAGS=\"${OPENMC_LD_FLAGS}\""
-        cmake_cmd+=" -DCMAKE_MODULE_LINKER_FLAGS=\"${OPENMC_LD_FLAGS}\""
-    fi
 
     # Finally, run the cmake command with optionally added flags
     eval $cmake_cmd ..
 
     # Compile and install
-    make VERBOSE=1
+    compile_results_file="$root_dir/openmc_offloading_benchmarks"
+    compile_results_file+="/progression_tests/small/compile_results.txt"
+    make VERBOSE=1 > $compile_results_file 2>&1
     make install
 fi
