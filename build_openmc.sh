@@ -18,11 +18,18 @@ if [[ "$1" == "download" ]]; then
         tar -xzvf vht6ub1q27hujkqpz1k0s48lrv44op0v.tgz
         rm vht6ub1q27hujkqpz1k0s48lrv44op0v.tgz
     fi
+
+    if [[ ! -d "hdf5" ]]; then
+        git clone git@github.com:akilandrews/hdf5.git
+        cd hdf5
+        git checkout pp4ogpc
+        cd ..
+    fi
 fi
 
 # Build OpenMC Monte Carlo
 if [[ "$1" == "compile" ]]; then
-    source clang_env.sh
+    source $HOME/config/clang_gfx906_env.sh
     root_dir="$(pwd)"
     source ${root_dir}/hdf5/env.sh
     export HDF5_ROOT=${root_dir}/install/ci-StdShar-Clang
