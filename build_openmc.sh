@@ -29,7 +29,7 @@ fi
 
 # Build OpenMC Monte Carlo
 if [[ "$1" == "compile" ]]; then
-    source $HOME/config/clang_gfx906_env.sh
+    source $HOME/config/clang20_gfx906_env.sh
     root_dir="$(pwd)"
     source ${root_dir}/hdf5/env.sh
     export HDF5_ROOT=${root_dir}/install/ci-StdShar-Clang
