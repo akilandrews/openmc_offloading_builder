@@ -63,4 +63,9 @@ if [[ "$1" == "compile" ]]; then
     compile_results_file+="/progression_tests/small/compile_results.txt"
     make VERBOSE=1 > $compile_results_file 2>&1
     make install
+
+    # Copy compile results to medium and large simulation folders
+    cp $compile_results_file $root_dir/openmc_offloading_benchmarks/progression_tests/medium
+    cp $compile_results_file $root_dir/openmc_offloading_benchmarks/progression_tests/large
+    cd $root_dir
 fi
