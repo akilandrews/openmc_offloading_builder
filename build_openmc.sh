@@ -1,16 +1,22 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Clone OpenMC source, benchmarks repository, OpenMC's cross section data files
 if [[ "$1" == "download" ]]; then
+    root_dir="$(pwd)"
     if [[ ! -d "openmc" ]]; then  
         git clone --recursive git@github.com:akilandrews/openmc.git
         cd openmc
         git checkout pp4ogpc
-        cd ..
+        cd $root_dir
     fi
 
     if [[ ! -d "openmc_offloading_benchmarks" ]]; then  
-        git clone https://github.com/jtramm/openmc_offloading_benchmarks.git
+        git clone https://github.com/jtramm/openmc_offloading_benchmarks
+        cd openmc_offloading_benchmarks/progression_tests
+        mv small omc-small
+        mv medium omc-medium
+        mv large omc-large
+        cd $root_dir
     fi
 
     if [[ ! -d "nndc_hdf5" ]]; then  
@@ -23,14 +29,19 @@ if [[ "$1" == "download" ]]; then
         git clone git@github.com:akilandrews/hdf5.git
         cd hdf5
         git checkout pp4ogpc
-        cd ..
+        cd $root_dir
     fi
 fi
 
 # Build OpenMC Monte Carlo
 if [[ "$1" == "compile" ]]; then
-    source $HOME/config/clang20_gfx906_env.sh
     root_dir="$(pwd)"
+    llvm_install_dir=$(readlink -f "$root_dir/../")
+    CLANG_INSTALL_DIR=$llvm_install_dir/local/clang
+    LLVM_BUILD_DIR=$llvm_install_dir/llvm-build
+    clang_config=$root_dir/../NNSA-IMPACT_LLNL_UNM_Research/data-collector/
+    clang_config+=clang/clang20_gfx906_env.sh
+    source $(readlink -f "$clang_config")
     source ${root_dir}/hdf5/env.sh
     export HDF5_ROOT=${root_dir}/install/ci-StdShar-Clang
     OPENMC_TARGET=llvm_pp4ogpc
@@ -60,12 +71,16 @@ if [[ "$1" == "compile" ]]; then
 
     # Compile and install
     compile_results_file="$root_dir/openmc_offloading_benchmarks"
-    compile_results_file+="/progression_tests/small/compile_results.txt"
+    compile_results_file+="/progression_tests/omc-small/compile_results.txt"
     make VERBOSE=1 > $compile_results_file 2>&1
     make install
 
     # Copy compile results to medium and large simulation folders
-    cp $compile_results_file $root_dir/openmc_offloading_benchmarks/progression_tests/medium
-    cp $compile_results_file $root_dir/openmc_offloading_benchmarks/progression_tests/large
+    target_dir=$root_dir/openmc_offloading_benchmarks/progression_tests/
+    target_dir+=omc-medium
+    cp $compile_results_file $target_dir
+    target_dir=$root_dir/openmc_offloading_benchmarks/progression_tests/
+    target_dir+=omc-large
+    cp $compile_results_file $target_dir 
     cd $root_dir
 fi
